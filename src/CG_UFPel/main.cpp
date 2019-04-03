@@ -82,14 +82,12 @@ int main()
     // load models
     // -----------
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
-    
-    // draw in wireframe
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     //model to render
     glm::vec3 vecMovimentoOBJ(0.0f, -5.5f, 0.0f); // to translate it down so it's at the center of the scene
     glm::mat4 model;
     model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));    // it's a bit too big for our scene, so scale it down
+    
     
     // render loop
     // -----------
@@ -187,6 +185,16 @@ void processInput(GLFWwindow *window, glm::vec3 *vecMovimentoOBJ)
         vecMovimentoOBJ->y = 0.0f;
         vecMovimentoOBJ->z = 0.0f;
     }
+    
+    // Draw or Not in wireframe
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    
     
 }
 

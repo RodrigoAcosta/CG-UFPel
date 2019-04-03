@@ -19,3 +19,8 @@ After you choose the object.
 * Key S: Move the Object to Down;
 * Key A: Move the Object to Left;
 * Key D: Move the Object to Right;
+
+### Keyboard Inputs to View WireFrame of Objects:
+
+* Press Key SPACE: To Viwe Wireframe of Objects;
+
