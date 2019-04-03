@@ -29,7 +29,6 @@ bool firstMouse = true;
 
 // timing
 float deltaTime = 0.0f;
-float deltaDistance = 0.0f;
 float lastFrame = 0.0f;
 float currentFrame = 0.0f;
 
@@ -85,7 +84,7 @@ int main()
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
     
     // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     //model to render
     glm::vec3 vecMovimentoOBJ(0.0f, -5.5f, 0.0f); // to translate it down so it's at the center of the scene
@@ -161,30 +160,30 @@ void processInput(GLFWwindow *window, glm::vec3 *vecMovimentoOBJ)
         camera.ProcessKeyboard(RIGHT, 0.012f);
    
     //MOVE REFERENCED OBJECT
-    deltaTime = currentFrame - lastFrame;
+    deltaTime = lastFrame - currentFrame;
     currentFrame = lastFrame;
     
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         vecMovimentoOBJ->x = 0.0f;
-        vecMovimentoOBJ->y = ((float)deltaTime*-50.0f)/10;
+        vecMovimentoOBJ->y = ((float)deltaTime*50.0f)/10;
         vecMovimentoOBJ->z = 0.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
         vecMovimentoOBJ->x = 0.0f;
-        vecMovimentoOBJ->y = ((float)deltaTime*50.0f)/10;
+        vecMovimentoOBJ->y = ((float)deltaTime*-50.0f)/10;
         vecMovimentoOBJ->z = 0.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        vecMovimentoOBJ->x = ((float)deltaTime*50.0f)/10;
+        vecMovimentoOBJ->x = ((float)deltaTime*-50.0f)/10;
         vecMovimentoOBJ->y = 0.0f;
         vecMovimentoOBJ->z = 0.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        vecMovimentoOBJ->x = ((float)deltaTime*-50.0f)/10;
+        vecMovimentoOBJ->x = ((float)deltaTime*50.0f)/10;
         vecMovimentoOBJ->y = 0.0f;
         vecMovimentoOBJ->z = 0.0f;
     }
