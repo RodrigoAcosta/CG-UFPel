@@ -15,7 +15,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window, glm::vec3 *vecMovimentoOBJ);
+void processInput(GLFWwindow *window, vector<glm::vec3> *vecMovimentoOBJ);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -84,7 +84,9 @@ int main()
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
 
     //model to render
-    glm::vec3 vecMovimentoOBJ(0.0f, -5.5f, 0.0f); // to translate it down so it's at the center of the scene
+    std::vector <glm::vec3> vecMovimentoOBJ; //vetor of matrix to translate objets of scene
+    vecMovimentoOBJ.push_back(glm::vec3(0.0, -5.5, 0.0)); // add matrix to translate it down so it's at the center of the scene
+    
     glm::mat4 model;
     model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));    // it's a bit too big for our scene, so scale it down
     
@@ -116,16 +118,23 @@ int main()
         ourShader.setMat4("view", view);
 
         // render the loaded model
-
-        model = glm::translate(model, glm::vec3(vecMovimentoOBJ.x, vecMovimentoOBJ.y, vecMovimentoOBJ.z));
+//        std::cout << "x= " << vecMovimentoOBJ.begin()->x << " y=" << vecMovimentoOBJ.begin()->y << std::endl;
+        
+        
+        //FOR ENTRE AS MATRIZES DE TRANSLACAO DO MODELO
+        
+        model = glm::translate(model, glm::vec3(vecMovimentoOBJ.begin()->x, vecMovimentoOBJ.begin()->y, vecMovimentoOBJ.begin()->z));
        
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
+        
+        
+        
 
         //clear variables of translate
-        vecMovimentoOBJ.x = 0.0f;
-        vecMovimentoOBJ.y = 0.0f;
-        vecMovimentoOBJ.z = 0.0f;
+        vecMovimentoOBJ.begin()->x = 0.0f;
+        vecMovimentoOBJ.begin()->y = 0.0f;
+        vecMovimentoOBJ.begin()->z = 0.0f;
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -141,11 +150,13 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window, glm::vec3 *vecMovimentoOBJ)
+void processInput(GLFWwindow *window, vector<glm::vec3> *vecMovimentoOBJ)
 {
     //EXIT PROGRAM
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
         glfwSetWindowShouldClose(window, true);
+        std::cout << vecMovimentoOBJ->size() << std::endl;
+    }
     
     //MOVE CAMERA
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -163,28 +174,30 @@ void processInput(GLFWwindow *window, glm::vec3 *vecMovimentoOBJ)
     
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        vecMovimentoOBJ->x = 0.0f;
-        vecMovimentoOBJ->y = ((float)deltaTime*50.0f)/10;
-        vecMovimentoOBJ->z = 0.0f;
+        vecMovimentoOBJ->back().x = 0.0f;
+        vecMovimentoOBJ->back().y = ((float)deltaTime*50.0f)/10;
+        vecMovimentoOBJ->back().z = 0.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        vecMovimentoOBJ->x = 0.0f;
-        vecMovimentoOBJ->y = ((float)deltaTime*-50.0f)/10;
-        vecMovimentoOBJ->z = 0.0f;
+        vecMovimentoOBJ->back().x = 0.0f;
+        vecMovimentoOBJ->back().y = ((float)deltaTime*-50.0f)/10;
+        vecMovimentoOBJ->back().z = 0.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        vecMovimentoOBJ->x = ((float)deltaTime*-50.0f)/10;
-        vecMovimentoOBJ->y = 0.0f;
-        vecMovimentoOBJ->z = 0.0f;
+        vecMovimentoOBJ->back().x = ((float)deltaTime*-50.0f)/10;
+        vecMovimentoOBJ->back().y = 0.0f;
+        vecMovimentoOBJ->back().z = 0.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        vecMovimentoOBJ->x = ((float)deltaTime*50.0f)/10;
-        vecMovimentoOBJ->y = 0.0f;
-        vecMovimentoOBJ->z = 0.0f;
+        vecMovimentoOBJ->back().x = ((float)deltaTime*50.0f)/10;
+        vecMovimentoOBJ->back().y = 0.0f;
+        vecMovimentoOBJ->back().z = 0.0f;
     }
+    
+//    std::cout << "x= " << vecMovimentoOBJ.begin()->x << " y=" << vecMovimentoOBJ.begin()->y << std::endl;
     
     // Draw or Not in wireframe
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
