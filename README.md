@@ -24,3 +24,7 @@ After you choose the object.
 
 * Press Key SPACE: To Viwe Wireframe of Objects;
 
+### Keyboard Inputs to Set the Objects to Movement:
+
+* Press Key "-": To Change the Object to Movement;
+* Press Key "+": To Change the Object to Movement;
