@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "models.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -34,10 +35,9 @@ float currentFrame = 0.0f;
 float currentButtonTime = 0.0f;
 float lastButtonTime = 0.0f;
 
-//Vector of Matrix of Models
-std::vector<glm::mat4> modelos;
-glm::vec3 vecMovModel(glm::vec3(0.0f)); //vetor to translate objets of scene
-int modelSetToMov = 0; //variable to moviment the models
+
+//Class Models
+Models modelos;
 
 
 int main()
@@ -90,20 +90,6 @@ int main()
     // -----------
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
     
-    //Models
-    // render the loaded model
-    //std::vector<glm::mat4> modelos;
-    
-    modelos.push_back(glm::mat4(1.0f));  //objeto 1
-    //modelos.push_back(glm::mat4(1.0f));  //objeto 2
-    
-    //percorre todos os modelos setando para escala adequada e translada para a origem certa
-    for(int it = 0; it < modelos.size(); it++){
-        modelos[it] = glm::translate(modelos[it], glm::vec3(0.0f + it, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-        modelos[it] = glm::scale(modelos[it], glm::vec3(0.2f, 0.2f, 0.2f));    // it's a bit too big for our scene, so scale it down
-    }
-    
-    
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -130,22 +116,12 @@ int main()
         ourShader.setMat4("view", view);
 
         
-        //seta todas as matrizes de modelos para poder renderizar
-        for(int it = 0; it < modelos.size(); it++){
-            
-            //IF DE MOVIMENTAR APENAS O MODELO QUE ESTA APONTADO NO MOMENTO
-            if(it == modelSetToMov)
-            {
-            modelos[it] = glm::translate(modelos[it], glm::vec3(vecMovModel.x, vecMovModel.y, vecMovModel.z));
-            }
-            ourShader.setMat4("model", modelos[it]);
-            ourModel.Draw(ourShader);
-        }
-        
+        modelos.DrawModels(ourShader, ourModel);
+    
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
-        vecMovModel = glm::vec3(0.0f); //clear vector movement
+        modelos.setVecMovModel(0.0f,0.0f,0.0f); //clear vector movement
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -184,29 +160,16 @@ void processInput(GLFWwindow *window)
     currentFrame = lastFrame;
     
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        vecMovModel.x = 0.0f;
-        vecMovModel.y = ((float)deltaTime*50.0f)/10;
-        vecMovModel.z = 0.0f;
-    }
+        modelos.setVecMovModel(0.0f,((float)deltaTime*50.0f)/10,0.0f);
+    
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        vecMovModel.x = 0.0f;
-        vecMovModel.y = ((float)deltaTime*-50.0f)/10;
-        vecMovModel.z = 0.0f;
-    }
+        modelos.setVecMovModel(0.0f,((float)deltaTime*-50.0f)/10,0.0f);
+    
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        vecMovModel.x = ((float)deltaTime*-50.0f)/10;
-        vecMovModel.y = 0.0f;
-        vecMovModel.z = 0.0f;
-    }
+        modelos.setVecMovModel(((float)deltaTime*-50.0f)/10,0.0f,0.0f);
+    
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        vecMovModel.x = ((float)deltaTime*50.0f)/10;
-        vecMovModel.y = 0.0f;
-        vecMovModel.z = 0.0f;
-    }
+        modelos.setVecMovModel(((float)deltaTime*50.0f)/10,0.0f,0.0f);
     
     
     // Draw or Not in wireframe
@@ -227,13 +190,8 @@ void processInput(GLFWwindow *window)
     //Add New Object in the scene
     if ((glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1))
     {
-        modelos.push_back(glm::mat4(1.0f));  //objeto com matriz identidade
-        modelos.back() = glm::translate(modelos.back(), glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-        modelos.back() = glm::scale(modelos.back(), glm::vec3(0.2f, 0.2f, 0.2f));    // it's a bit too big for our scene, so scale it down
-        
-        modelSetToMov = modelos.size() - 1;
-        //SETAR O ID DO OBJETO PARA MOVIMENTAR O ULTIMO CRIADO
-        
+        modelos.createNewModel(); //add new model of object in the scene
+        modelos.setModelSetToMov(modelos.getVecModelsSize() - 1); //SETAR O ID DO OBJETO PARA MOVIMENTAR O ULTIMO CRIADO
         
         std::cout << "Add New Object" << std::endl;
         lastButtonTime = currentButtonTime;
@@ -243,21 +201,21 @@ void processInput(GLFWwindow *window)
     //Setar qual objeto modificar
     if ((glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1))
     {
-        if( modelSetToMov > 0)
+        if( modelos.getModelSetToMov() > 0)
         {
-             modelSetToMov -= 1;
+             modelos.setModelSetToMov(modelos.getModelSetToMov() - 1);
         }
-        std::cout << "modelSetToMov = " << modelSetToMov << std::endl;
+        std::cout << "modelSetToMov = " << modelos.getModelSetToMov() << std::endl;
         lastButtonTime = currentButtonTime;
     }
     
     if ((glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1))
     {
-        if( modelSetToMov < (modelos.size() -1))
+        if( modelos.getModelSetToMov() < (modelos.getVecModelsSize() -1))
         {
-            modelSetToMov += 1;
+            modelos.setModelSetToMov(modelos.getModelSetToMov() + 1);
         }
-        std::cout << "modelSetToMov = " << modelSetToMov << std::endl;
+        std::cout << "modelSetToMov = " << modelos.getModelSetToMov() << std::endl;
         lastButtonTime = currentButtonTime;
     }
     
