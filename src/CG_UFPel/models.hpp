@@ -80,6 +80,16 @@ public:
         }
     }
     
+    void scaleUpModel()
+    {
+        vecModels[getModelSetToMov()] = glm::scale(vecModels[getModelSetToMov()], glm::vec3(1.2f, 1.2f, 1.2f));
+    }
+    
+    void scaleDownModel()
+    {
+        vecModels[getModelSetToMov()] = glm::scale(vecModels[getModelSetToMov()], glm::vec3(0.8f, 0.8f, 0.8f));
+    }
+    
     
 private:
     

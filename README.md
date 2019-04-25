@@ -28,3 +28,8 @@ After you choose the object.
 
 * Press Key "-": To Change the Object to Movement;
 * Press Key "+": To Change the Object to Movement;
+
+### Keyboard Inputs to Set Scale the Objects:
+
+* Press Key "8": To Change Scale to Down;
+* Press Key "9": To Change Scale to Up;

@@ -188,7 +188,7 @@ void processInput(GLFWwindow *window)
     }
     
     //Add New Object in the scene
-    if ((glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1))
+    if ((glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
     {
         modelos.createNewModel(); //add new model of object in the scene
         modelos.setModelSetToMov(modelos.getVecModelsSize() - 1); //SETAR O ID DO OBJETO PARA MOVIMENTAR O ULTIMO CRIADO
@@ -199,7 +199,7 @@ void processInput(GLFWwindow *window)
     
     
     //Setar qual objeto modificar
-    if ((glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1))
+    if ((glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
     {
         if( modelos.getModelSetToMov() > 0)
         {
@@ -209,7 +209,7 @@ void processInput(GLFWwindow *window)
         lastButtonTime = currentButtonTime;
     }
     
-    if ((glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1))
+    if ((glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
     {
         if( modelos.getModelSetToMov() < (modelos.getVecModelsSize() -1))
         {
@@ -219,7 +219,32 @@ void processInput(GLFWwindow *window)
         lastButtonTime = currentButtonTime;
     }
     
+    //scale up the model slected
+    if ((glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
+    {
+        if(modelos.getVecModelsSize() > 0)
+        {
+            modelos.scaleUpModel();
+            lastButtonTime = currentButtonTime;
+            std::cout << "Model Scale Up" << std::endl;
+        }else{
+             std::cout << "Não há Modelos para aplicar a propriedade de Escala." << std::endl;
+        }
+    }
     
+    //scale up the model slected
+    if ((glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
+    {
+        if(modelos.getVecModelsSize() > 0)
+        {
+            modelos.scaleDownModel();
+            lastButtonTime = currentButtonTime;
+            std::cout << "Model Scale Down" << std::endl;
+        }else{
+            std::cout << "Não há Modelos para aplicar a propriedade de Escala." << std::endl;
+        }
+        
+    }
     
 }
 
