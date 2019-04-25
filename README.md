@@ -33,3 +33,9 @@ After you choose the object.
 
 * Press Key "8": To Change Scale to Down;
 * Press Key "9": To Change Scale to Up;
+
+### Keyboard Inputs to Rotate the Objects:
+
+* Press Key "R" + Key "X": To Rotate in Axis X;
+* Press Key "R" + Key "Y": To Rotate in Axis Y;
+* Press Key "R" + Key "Z": To Rotate in Axis Z;

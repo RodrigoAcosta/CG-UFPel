@@ -90,6 +90,23 @@ public:
         vecModels[getModelSetToMov()] = glm::scale(vecModels[getModelSetToMov()], glm::vec3(0.8f, 0.8f, 0.8f));
     }
     
+    void rotateX(float deltaTime)
+    {
+        vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], deltaTime, glm::vec3(0.2f, 0.0f, 0.0f));
+    }
+    
+    void rotateY(float deltaTime)
+    {
+        vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], deltaTime, glm::vec3( 0.0f, 0.2f, 0.0f));
+    }
+    
+    void rotateZ(float deltaTime)
+    {
+        vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], deltaTime, glm::vec3(0.0f, 0.0f, 0.2f));
+    }
+    
+    
+    
     
 private:
     

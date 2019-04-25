@@ -243,10 +243,56 @@ void processInput(GLFWwindow *window)
         }else{
             std::cout << "Não há Modelos para aplicar a propriedade de Escala." << std::endl;
         }
-        
     }
     
+    //rotate on axis X
+    if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
+    {
+        if(modelos.getVecModelsSize() > 0)
+        {
+            modelos.rotateX(deltaTime);
+        }else{
+            std::cout << "Não há Modelos para aplicar a propriedade de Rotação." << std::endl;
+        }
+    }
+
+    //rotate on axis Y
+    if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
+    {
+        if(modelos.getVecModelsSize() > 0)
+        {
+            modelos.rotateY(deltaTime);
+        }else{
+            std::cout << "Não há Modelos para aplicar a propriedade de Rotação." << std::endl;
+        }
+    }
+    
+    //rotate on axis Z
+    if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
+    {
+        if(modelos.getVecModelsSize() > 0)
+        {
+            modelos.rotateZ(deltaTime);
+        }else{
+            std::cout << "Não há Modelos para aplicar a propriedade de Rotação." << std::endl;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
+
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
