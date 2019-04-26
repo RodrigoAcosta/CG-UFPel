@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "models.hpp"
+#include "keyboard.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,7 +17,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
+//void processInput(GLFWwindow *window, Camera camera, Models modelos, float lastFrame);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -29,15 +30,14 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-float currentFrame = 0.0f;
-float currentButtonTime = 0.0f;
-float lastButtonTime = 0.0f;
-
 
 //Class Models
 Models modelos;
+
+//Class Keyboard
+
+Keyboard keyboard;
 
 
 int main()
@@ -95,11 +95,11 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
-        lastFrame = glfwGetTime();
+//        lastFrame = glfwGetTime();
 
         // input
         // -----
-        processInput(window);
+        keyboard.processInput(window, &camera, &modelos);
 
         // render
         // ------
@@ -130,167 +130,6 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
-}
-
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-    //control double click keys
-    currentButtonTime = glfwGetTime();
-    
-    
-    //EXIT PROGRAM
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-        glfwSetWindowShouldClose(window, true);
-    }
-    
-    //MOVE CAMERA
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, 0.012f);
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, 0.012f);
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, 0.012f);
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, 0.012f);
-    
-    //MOVE REFERENCED OBJECT
-    deltaTime = lastFrame - currentFrame;
-    currentFrame = lastFrame;
-    
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        modelos.setVecMovModel(0.0f,((float)deltaTime*50.0f)/10,0.0f);
-    
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        modelos.setVecMovModel(0.0f,((float)deltaTime*-50.0f)/10,0.0f);
-    
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        modelos.setVecMovModel(((float)deltaTime*-50.0f)/10,0.0f,0.0f);
-    
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        modelos.setVecMovModel(((float)deltaTime*50.0f)/10,0.0f,0.0f);
-    
-    
-    // Draw or Not in wireframe
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }else
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-    
-    // Play/Stop Animation
-    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-    {
-        std::cout << "Play/Stop Animation" << std::endl;
-    }
-    
-    //Add New Object in the scene
-    if ((glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        modelos.createNewModel(); //add new model of object in the scene
-        modelos.setModelSetToMov(modelos.getVecModelsSize() - 1); //SETAR O ID DO OBJETO PARA MOVIMENTAR O ULTIMO CRIADO
-        
-        std::cout << "Add New Object" << std::endl;
-        lastButtonTime = currentButtonTime;
-    }
-    
-    
-    //Setar qual objeto modificar
-    if ((glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if( modelos.getModelSetToMov() > 0)
-        {
-             modelos.setModelSetToMov(modelos.getModelSetToMov() - 1);
-        }
-        std::cout << "modelSetToMov = " << modelos.getModelSetToMov() << std::endl;
-        lastButtonTime = currentButtonTime;
-    }
-    
-    if ((glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if( modelos.getModelSetToMov() < (modelos.getVecModelsSize() -1))
-        {
-            modelos.setModelSetToMov(modelos.getModelSetToMov() + 1);
-        }
-        std::cout << "modelSetToMov = " << modelos.getModelSetToMov() << std::endl;
-        lastButtonTime = currentButtonTime;
-    }
-    
-    //scale up the model slected
-    if ((glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if(modelos.getVecModelsSize() > 0)
-        {
-            modelos.scaleUpModel();
-            lastButtonTime = currentButtonTime;
-            std::cout << "Model Scale Up" << std::endl;
-        }else{
-             std::cout << "Não há Modelos para aplicar a propriedade de Escala." << std::endl;
-        }
-    }
-    
-    //scale up the model slected
-    if ((glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if(modelos.getVecModelsSize() > 0)
-        {
-            modelos.scaleDownModel();
-            lastButtonTime = currentButtonTime;
-            std::cout << "Model Scale Down" << std::endl;
-        }else{
-            std::cout << "Não há Modelos para aplicar a propriedade de Escala." << std::endl;
-        }
-    }
-    
-    //rotate on axis X
-    if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if(modelos.getVecModelsSize() > 0)
-        {
-            modelos.rotateX(deltaTime);
-        }else{
-            std::cout << "Não há Modelos para aplicar a propriedade de Rotação." << std::endl;
-        }
-    }
-
-    //rotate on axis Y
-    if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if(modelos.getVecModelsSize() > 0)
-        {
-            modelos.rotateY(deltaTime);
-        }else{
-            std::cout << "Não há Modelos para aplicar a propriedade de Rotação." << std::endl;
-        }
-    }
-    
-    //rotate on axis Z
-    if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 0.25))
-    {
-        if(modelos.getVecModelsSize() > 0)
-        {
-            modelos.rotateZ(deltaTime);
-        }else{
-            std::cout << "Não há Modelos para aplicar a propriedade de Rotação." << std::endl;
-        }
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
 
 
