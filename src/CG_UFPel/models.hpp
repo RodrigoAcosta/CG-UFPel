@@ -19,6 +19,7 @@
 #include <learnopengl/shader.h>
 #include <learnopengl/model.h>
 
+#include <math.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -177,7 +178,7 @@ public:
         float distanciaP1P2Y = sqrt( pow (toPoint.y - getYModel(), 2));
         float distanciaP1P2Z = sqrt( pow (toPoint.z - getZModel(), 2));
         
-        //float tempoIni = glfwGetTime();
+        float tempoIni = glfwGetTime();
         
         currentFrame = glfwGetTime();
         lastFrame = currentFrame;
@@ -199,8 +200,8 @@ public:
             
         }while( ((sqrt( pow (toPoint.x - getXModel(), 2)) > 0.01)
                 || (sqrt( pow (toPoint.y - getYModel(), 2)) > 0.01)
-                 || (sqrt( pow (toPoint.z - getZModel(), 2)) > 0.01)));
-//                && ((currentFrame - tempoIni) <= tempoTotal));
+                 || (sqrt( pow (toPoint.z - getZModel(), 2)) > 0.01))
+                && ((currentFrame - tempoIni) <= tempoTotal));
         
         
 //        std::cout << "FINISH "<< std::endl;
@@ -227,6 +228,7 @@ public:
         
         float tempoIni = 0;
         glm::vec3 savePoint;
+//        float newX, newY;
 
         for (int i = 0; i <= qtLaps; i++)
         {
@@ -246,13 +248,18 @@ public:
                 jumpToXYZ(inPoint); //salta para o ponto que esta girando em volta
 
                 //rotaciona
+//                vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], (float)((30 * PI) / 180), glm::vec3( 0.0f, 1.0f, 0.0f));
+                
                 vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], 0.01f, glm::vec3( 0.0f, 1.0f, 0.0f));
 
                 //volta para a posicao inicial
                 jumpToXYZ(savePoint);
 
                 //translate
-                setVecMovModel(0.1,0.0f,0.0f);
+//                newX = inPoint.x + ( cos(30) * (savePoint.x-inPoint.x) + sin(30) * (savePoint.y -inPoint.y));
+//                newY = inPoint.y + ( -sin(30) * (savePoint.x-inPoint.x) + cos(30) * (savePoint.y -inPoint.y));
+//                setVecMovModel(newX,0.0f, newY);
+                setVecMovModel(0.1f,0.0f, 0.0f);
                 
                 DrawModels(shader, ourModel);
 
@@ -270,14 +277,6 @@ public:
         
         std::cout << "Tempo Final: " << (currentFrame - tempoIni) << std::endl;
         
-        
-        
-        
-        
-        
-        
-        
-        
     }
     
     
@@ -287,6 +286,81 @@ public:
         setXModel(jumpTo.x);
         setYModel(jumpTo.y);
         setZModel(jumpTo.z);
+    }
+    
+    
+    void bezier(int p1x, int p1y, int p2x, int p2y, int p3x, int p3y, int p4x, int p4y, int bezierTempoTotal, Shader shader, Model ourModel, GLFWwindow* window){
+        
+        
+        float max, t, xmax, ymax, xmin, ymin;
+        int i, xt, yt;
+        
+        if (p1x > p2x && p1x > p3x && p1x > p4x)
+            xmax = p1x;
+        else
+            if (p2x > p1x && p2x > p3x && p2x > p4x)
+                xmax = p2x;
+            else
+                if (p3x > p1x && p3x > p2x && p3x > p4x)
+                    xmax = p3x;
+                else
+                    if (p4x > p1x && p4x > p2x && p4x > p3x)
+                        xmax = p4x;
+        
+        if (p1y > p2y && p1y > p3y && p1y > p4y)
+            ymax = p1y;
+        else
+            if (p2y > p1y && p2y > p3y && p2y > p4y)
+                ymax = p2y;
+            else
+                if (p3y > p1y && p3y > p2y && p3y > p4y)
+                    ymax = p3y;
+                else
+                    if (p4y > p1y && p4y > p2y && p4y > p3y)
+                        ymax = p4y;
+        
+        if (p1x < p2x && p1x < p3x && p1x < p4x)
+            xmin = p1x;
+        else
+            if (p2x < p1x && p2x < p3x && p2x < p4x)
+                xmin = p2x;
+            else
+                if (p3x < p1x && p3x< p2x && p3x < p4x)
+                    xmin = p3x;
+                else
+                    if (p4x < p1x && p4x< p2x && p4x < p3x)
+                        xmin = p4x;
+        
+        if (p1y < p2y && p1y < p3y && p1y < p4y)
+            ymin = p1y;
+        else
+            if (p2y < p1y && p2y < p3y && p2y < p4y)
+                ymin = p2y;
+            else
+                if (p3y < p1y && p3y < p2y && p3y < p4y)
+                    ymin = p3y;
+                else
+                    if (p4y < p1y && p4y < p2y && p4y < p3y)
+                        ymin = p4y;
+        
+        if ((xmax-xmin) > (ymax-ymin))
+            max = 3 * (xmax-xmin);
+        else
+            max = 3 * (ymax-ymin);
+        
+        
+        
+        for (i=0; i<=max; i++)
+        {
+            
+            t = i/max;
+            
+            xt = (1-t)*(1-t)*(1-t) * p1x + 3*t*(1-t)*(1-t)*p2x + 3*t*t*(1-t)*p3x + t*t*t*p4x;
+            yt = (1-t)*(1-t)*(1-t) * p1y + 3*t*(1-t)*(1-t)*p2y + 3*t*t*(1-t)*p3y + t*t*t*p4y;
+            
+            linearTranslation(glm::vec3(xt,yt,0.0f), bezierTempoTotal, shader, ourModel, window);
+            
+        }
     }
     
     

@@ -284,8 +284,55 @@ public:
             
         }
         
-        
-        
+        //Bezier
+        if ((glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1.25))
+        {
+            if(modelos->getVecModelsSize() > 0)
+            {
+                std::cout << "Bezier Parameters:" << std::endl;
+                std::cout << "Inform P1.x:" << std::endl;
+                std::cin >> bezierP1.x;
+                std::cout << "Inform P1.y:" << std::endl;
+                std::cin >> bezierP1.y;
+                
+                std::cout << "Inform P2.x:" << std::endl;
+                std::cin >> bezierP2.x;
+                std::cout << "Inform P2.y:" << std::endl;
+                std::cin >> bezierP2.y;
+                
+                std::cout << "Inform P3.x:" << std::endl;
+                std::cin >> bezierP3.x;
+                std::cout << "Inform P3.y:" << std::endl;
+                std::cin >> bezierP3.y;
+                
+                std::cout << "Inform P4.x:" << std::endl;
+                std::cin >> bezierP4.x;
+                std::cout << "Inform P4.y:" << std::endl;
+                std::cin >> bezierP4.y;
+                
+                std::cout << "Inform Time of Execution :" << std::endl;
+                std::cin >> bezierTempoTotal;
+                
+                //PLAY LINEAR TRANSLATION
+                modelos->bezier(bezierP1.x,bezierP1.y, bezierP2.x,bezierP2.y, bezierP3.x,bezierP3.y, bezierP4.x,bezierP4.y, bezierTempoTotal, *shader, *ourModel, window);
+                
+                
+                bezierP1.x = 0.0f;
+                bezierP1.y = 0.0f;
+                bezierP2.x = 0.0f;
+                bezierP2.y = 0.0f;
+                bezierP3.x = 0.0f;
+                bezierP3.y = 0.0f;
+                bezierP4.x = 0.0f;
+                bezierP4.y = 0.0f;
+                bezierTempoTotal = 0;
+                lastButtonTime = currentButtonTime;
+            
+            }else{
+                std::cout << "Não há Modelos para aplicar Bezier." << std::endl;
+            }
+            
+        }
         
         
         
@@ -334,6 +381,13 @@ private:
     
     //Variable to JumpTo
     glm::vec3 jumpToXYZ;
+    
+    //Variable to Bezier
+    glm::vec3 bezierP1;
+    glm::vec3 bezierP2;
+    glm::vec3 bezierP3;
+    glm::vec3 bezierP4;
+    int bezierTempoTotal;
     
 };
 #endif
