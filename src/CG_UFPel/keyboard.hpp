@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "models.hpp"
 #include <learnopengl/camera.h>
@@ -38,7 +39,7 @@ class Keyboard
 public:
     // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
     // ---------------------------------------------------------------------------------------------------------
-    void processInput(GLFWwindow *window, Camera *camera, Models *modelos)
+    void processInput(GLFWwindow *window, Camera *camera, Models *modelos, Shader *shader, Model *ourModel)
     {
         
         currentFrame = glfwGetTime();  //controle suave translation
@@ -86,9 +87,16 @@ public:
         }
         
         // Play/Stop Animation
-        if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+        if ((glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1.25))
         {
-            std::cout << "Play/Stop Animation" << std::endl;
+            if(modelos->getVecModelsSize() > 0)
+            {
+                std::cout << "Play/Stop Animation" << std::endl;
+                lastButtonTime = currentButtonTime;
+            }else{
+                std::cout << "Não há Modelos para aplicar Animação." << std::endl;
+            }
+        
         }
         
         //Add New Object in the scene
@@ -182,6 +190,99 @@ public:
             }
         }
         
+        //Linear Translation
+        if ((glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1.25))
+        {
+            if(modelos->getVecModelsSize() > 0)
+            {
+                std::cout << "Linear Translation Function" << std::endl;
+                std::cout << "Inform X:" << std::endl;
+                std::cin >> coordLinearTranslation.x;
+                std::cout << "Inform Y:" << std::endl;
+                std::cin >> coordLinearTranslation.y;
+                std::cout << "Inform Z:" << std::endl;
+                std::cin >> coordLinearTranslation.z;
+                std::cout << "Inform Time of Execution:" << std::endl;
+                std::cin >> tempoTotal;
+                
+                
+                //PLAY LINEAR TRANSLATION
+                modelos->linearTranslation(coordLinearTranslation, tempoTotal, *shader, *ourModel, window);
+                
+                coordLinearTranslation.x = 0.0f;
+                coordLinearTranslation.y = 0.0f;
+                coordLinearTranslation.z = 0.0f;
+                
+                lastButtonTime = currentButtonTime;
+            }else{
+                std::cout << "Não há Modelos para aplicar Translação." << std::endl;
+            }
+        
+        }
+        
+        //Rotation at Point
+        if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1.25))
+        {
+            
+            if(modelos->getVecModelsSize() > 0)
+            {
+                std::cout << "Rotation At Point Function" << std::endl;
+                std::cout << "Inform X:" << std::endl;
+                std::cin >> coordRotationPoint.x;
+                std::cout << "Inform Y:" << std::endl;
+                std::cin >> coordRotationPoint.y;
+                std::cout << "Inform Z:" << std::endl;
+                std::cin >> coordRotationPoint.z;
+                std::cout << "Inform Lap Time:" << std::endl;
+                std::cin >> tempoVolta;
+                std::cout << "Inform qt Laps:" << std::endl;
+                std::cin >> qtLaps;
+                
+                
+                //PLAY LINEAR TRANSLATION
+                modelos->RotationPoint(coordRotationPoint, tempoVolta, qtLaps, *shader, *ourModel, window);
+                
+                coordRotationPoint.x = 0.0f;
+                coordRotationPoint.y = 0.0f;
+                coordRotationPoint.z = 0.0f;
+                qtLaps = 0;
+                
+                lastButtonTime = currentButtonTime;
+            }else{
+                std::cout << "Não há Modelos para aplicar Translação." << std::endl;
+            }
+            
+        }
+        
+        
+        //Jump To X,Y,Z
+        if ((glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1.25))
+        {
+            
+            if(modelos->getVecModelsSize() > 0)
+            {
+                std::cout << "Jump To:" << std::endl;
+                std::cout << "Inform X:" << std::endl;
+                std::cin >> jumpToXYZ.x;
+                std::cout << "Inform Y:" << std::endl;
+                std::cin >> jumpToXYZ.y;
+                std::cout << "Inform Z:" << std::endl;
+                std::cin >> jumpToXYZ.z;
+                
+                
+                //PLAY LINEAR TRANSLATION
+                modelos->jumpToXYZ(jumpToXYZ);
+                
+                jumpToXYZ.x = 0.0f;
+                jumpToXYZ.y = 0.0f;
+                jumpToXYZ.z = 0.0f;
+                
+                lastButtonTime = currentButtonTime;
+            }else{
+                std::cout << "Não há Modelos para aplicar Translação." << std::endl;
+            }
+            
+        }
         
         
         
@@ -191,11 +292,28 @@ public:
         
         
         
+        //printa posicao do objeto
+        if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) && ((currentButtonTime - lastButtonTime) > 1.25))
+        {
+            
+            modelos->printPosition();
+            
+        }
         
-        
-        
-        
+    }// End Capture Keys
+    
+    float getLinearTranslationX(){
+        return coordLinearTranslation.x;
     }
+    
+    float getLinearTranslationY(){
+        return coordLinearTranslation.y;
+    }
+    
+    float getLinearTranslationZ(){
+        return coordLinearTranslation.z;
+    }
+    
     
 private:
    
@@ -204,6 +322,18 @@ private:
     float deltaTime = 0.0f;
     float currentFrame = 0.0f;
     float lastFrame = 0.0f;
+    
+    //Variables to Linear Translation
+    glm::vec3 coordLinearTranslation;
+    int tempoTotal;
+    
+    //Variable to Rotation at Point
+    glm::vec3 coordRotationPoint;
+    int tempoVolta;
+    int qtLaps;
+    
+    //Variable to JumpTo
+    glm::vec3 jumpToXYZ;
     
 };
 #endif

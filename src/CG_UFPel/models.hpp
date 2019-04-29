@@ -2,7 +2,9 @@
 #define MODELS_H
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
@@ -36,10 +38,49 @@ public:
         vecModels.back() = glm::scale(vecModels.back(), glm::vec3(0.2f, 0.2f, 0.2f));    // it's a bit too big for our scene, so scale it down
     }
     
+    //GET'S PARA X,Y,Z DO MODELO,TAMANHO
     int getVecModelsSize()
     {
         return vecModels.size();
     }
+    
+    //GET X,Y,Z OF MODEL SELECTED
+    float getXModel()
+    {
+        const float *pSource = (const float*)glm::value_ptr(vecModels[getModelSetToMov()]);
+        return pSource[12];
+    }
+    
+    float getYModel()
+    {
+        const float *pSource = (const float*)glm::value_ptr(vecModels[getModelSetToMov()]);
+        return pSource[13];
+    }
+    
+    float getZModel()
+    {
+        const float *pSource = (const float*)glm::value_ptr(vecModels[getModelSetToMov()]);
+        return pSource[14];
+    }
+    
+    void setXModel(float x)
+    {
+        float *pSource = (float*)glm::value_ptr(vecModels[getModelSetToMov()]);
+        pSource[12] = x;
+    }
+    
+    void setYModel(float y)
+    {
+        float *pSource = (float*)glm::value_ptr(vecModels[getModelSetToMov()]);
+        pSource[13] = y;
+    }
+    
+    void setZModel(float z)
+    {
+        float *pSource = (float*)glm::value_ptr(vecModels[getModelSetToMov()]);
+        pSource[14] = z;
+    }
+    
     
     void setModelSetToMov (int n)
     {
@@ -106,7 +147,113 @@ public:
     }
     
     
+    //Linear Translation to Point OF MODELS
+    void printPosition()
+    {
+        std::cout << "X: " << getXModel() << endl;
+        std::cout << "Y: " << getYModel() << endl;
+        std::cout << "Z: " << getZModel() << endl;
+        
+    }
     
+    
+    //Linear Translation to Point OF MODELS
+    void linearTranslation(glm::vec3 toPoint, int tempoTotal, Shader shader, Model ourModel, GLFWwindow* window){
+        
+        //regra de 3 para transições suaves
+        //Distancia dos Pontos = sqrt( pow (x2 - x1, 2) + pow (y2 - y1, 2) + pow (z2 - z1, 2))
+        //tempoTotal(segs) -- Distancia dos Pontos
+        //       DeltaTime -- x
+        //(deltaTime*DistP1P2)/tempoTotal
+        //Calcula a Distancia entre os pontos
+        
+        
+        float distanciaP1P2X = sqrt( pow (toPoint.x - getXModel(), 2));
+        float distanciaP1P2Y = sqrt( pow (toPoint.y - getYModel(), 2));
+        float distanciaP1P2Z = sqrt( pow (toPoint.z - getZModel(), 2));
+        
+        float tempoIni = glfwGetTime();
+        
+        currentFrame = glfwGetTime();
+        lastFrame = currentFrame;
+        do
+        {
+            deltaTime =  currentFrame - lastFrame;
+            
+//            std:: cout << "DeltaTime: "<< deltaTime << endl;
+        setVecMovModel(((float)deltaTime*distanciaP1P2X)/tempoTotal,((float)deltaTime*distanciaP1P2Y)/tempoTotal,((float)deltaTime*distanciaP1P2Z)/tempoTotal);
+            
+            DrawModels(shader, ourModel);
+           
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+            
+            lastFrame = currentFrame;
+            currentFrame = glfwGetTime();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+        }while( ((sqrt( pow (toPoint.x - getXModel(), 2)) > 0.01)
+                || (sqrt( pow (toPoint.y - getYModel(), 2)) > 0.01)
+                 || (sqrt( pow (toPoint.z - getZModel(), 2)) > 0.01)));
+//                && ((currentFrame - tempoIni) <= tempoTotal));
+        
+        
+//        std::cout << "FINISH "<< std::endl;
+//        std:: cout << "Decorrido: "<<(currentFrame - tempoIni) << endl;
+//        std:: cout << "Tempo Total: "<< tempoTotal << endl;
+        setVecMovModel(0.0f,0.0f,0.0f); //clear vector movement
+    }
+    
+    
+    //Rotation Models at Point
+    void RotationPoint(glm::vec3 inPoint, int tempoVolta, int qtLaps, Shader shader, Model ourModel, GLFWwindow* window){
+        
+        //regra de 3 para transições suaves
+        //tempoVolta(segs) -- 360(Graus)
+        //       DeltaTime -- x(Graus)
+        float tempoIni = glfwGetTime();
+        currentFrame = glfwGetTime();
+        lastFrame = currentFrame;
+        
+        //Voltas Totais
+//        for (int i =0 ; i <= qtLaps; i++) {
+//
+//            //rotation at Point
+//            do
+//            {
+                deltaTime =  currentFrame - lastFrame;
+        
+                jumpToXYZ(inPoint);
+        
+                vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], (deltaTime*360)/tempoVolta, glm::vec3( 0.0f, 0.2f, 0.0f));
+        
+//                jumpToXYZ();
+        
+                DrawModels(shader, ourModel);
+                
+                glfwSwapBuffers(window);
+                glfwPollEvents();
+                
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                
+                lastFrame = currentFrame;
+                currentFrame = glfwGetTime();
+                
+//            }while(((currentFrame - tempoIni) <= tempoVolta));
+        
+//        }
+        
+    }
+    
+    
+    
+    //Jump To XYZ
+    void jumpToXYZ(glm::vec3 jumpTo){
+        
+        setXModel(jumpTo.x);
+        setYModel(jumpTo.y);
+        setZModel(jumpTo.z);
+    }
     
     
     
@@ -119,6 +266,9 @@ private:
     glm::vec3 vecMovModel = glm::vec3(0.0f,0.0f,0.0f); //vetor to translate objets of scene
     int modelSetToMov = 0; //variable to moviment the models
     
+    float deltaTime = 0.0f;
+    float currentFrame = 0.0f;
+    float lastFrame = 0.0f;
     /*  Functions   */
     
 };

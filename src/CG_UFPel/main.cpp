@@ -97,10 +97,6 @@ int main()
         // per-frame time logic
 //        lastFrame = glfwGetTime();
 
-        // input
-        // -----
-        keyboard.processInput(window, &camera, &modelos);
-
         // render
         // ------
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
@@ -115,6 +111,10 @@ int main()
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
+        // input
+        // -----
+        keyboard.processInput(window, &camera, &modelos, &ourShader, &ourModel);
+        
         
         modelos.DrawModels(ourShader, ourModel);
     
