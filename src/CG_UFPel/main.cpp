@@ -39,7 +39,6 @@ Models modelos;
 
 Keyboard keyboard;
 
-
 int main()
 {
     // glfw: initialize and configure

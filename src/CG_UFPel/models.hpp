@@ -4,6 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/transform2.hpp>
+
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,6 +27,8 @@
 #include <vector>
 using namespace std;
 using namespace glm;
+
+#define PI 3.14159265
 
 class Models
 {
@@ -172,7 +177,7 @@ public:
         float distanciaP1P2Y = sqrt( pow (toPoint.y - getYModel(), 2));
         float distanciaP1P2Z = sqrt( pow (toPoint.z - getZModel(), 2));
         
-        float tempoIni = glfwGetTime();
+        //float tempoIni = glfwGetTime();
         
         currentFrame = glfwGetTime();
         lastFrame = currentFrame;
@@ -211,40 +216,69 @@ public:
         //regra de 3 para transições suaves
         //tempoVolta(segs) -- 360(Graus)
         //       DeltaTime -- x(Graus)
-        float tempoIni = glfwGetTime();
-        currentFrame = glfwGetTime();
-        lastFrame = currentFrame;
-        
-        //Voltas Totais
-//        for (int i =0 ; i <= qtLaps; i++) {
+       
+//        float distanciaP1P2X = sqrt( pow (inPoint.x - getXModel(), 2));
+//        float distanciaP1P2Y = sqrt( pow (inPoint.y - getYModel(), 2));
+//        float distanciaP1P2Z = sqrt( pow (inPoint.z - getZModel(), 2));
 //
-//            //rotation at Point
-//            do
-//            {
+//
+//        float raio = distanciaP1P2X +distanciaP1P2Y+distanciaP1P2Z;
+        
+        
+        float tempoIni = 0;
+        glm::vec3 savePoint;
+
+        for (int i = 0; i <= qtLaps; i++)
+        {
+        
+            tempoIni = glfwGetTime();
+            currentFrame = glfwGetTime();
+            lastFrame = currentFrame;
+
+            do
+            {
                 deltaTime =  currentFrame - lastFrame;
-        
-                jumpToXYZ(inPoint);
-        
-                vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], (deltaTime*360)/tempoVolta, glm::vec3( 0.0f, 0.2f, 0.0f));
-        
-//                jumpToXYZ();
-        
-                DrawModels(shader, ourModel);
                 
+                savePoint.x = getXModel();
+                savePoint.y = getYModel();
+                savePoint.z = getZModel();
+
+                jumpToXYZ(inPoint); //salta para o ponto que esta girando em volta
+
+                //rotaciona
+                vecModels[getModelSetToMov()] = glm::rotate(vecModels[getModelSetToMov()], 0.01f, glm::vec3( 0.0f, 1.0f, 0.0f));
+
+                //volta para a posicao inicial
+                jumpToXYZ(savePoint);
+
+                //translate
+                setVecMovModel(0.1,0.0f,0.0f);
+                
+                DrawModels(shader, ourModel);
+
                 glfwSwapBuffers(window);
                 glfwPollEvents();
-                
+
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                
+
                 lastFrame = currentFrame;
                 currentFrame = glfwGetTime();
                 
-//            }while(((currentFrame - tempoIni) <= tempoVolta));
+            }while((currentFrame - tempoIni) <= tempoVolta);
+
+        }
         
-//        }
+        std::cout << "Tempo Final: " << (currentFrame - tempoIni) << std::endl;
+        
+        
+        
+        
+        
+        
+        
+        
         
     }
-    
     
     
     //Jump To XYZ
